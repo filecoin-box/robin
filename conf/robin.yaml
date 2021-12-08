@@ -1,0 +1,8 @@
+notify:
+  platform: slcak
+  token: xxx
+  channel: xxx
+
+monitor:
+  fullnode_api_info: xxx
+  minerId: f011111,f022222
