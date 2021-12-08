@@ -32,7 +32,7 @@ type Monitor struct {
 
 func StartMonitor() {
 	c := parse.GetRobinConfig()
-	api, err := NewFullNodeApi(c.M.Fullnode_api_info)
+	api, err := NewFullNodeApi(c.Monitor.Fullnode_api_info)
 	if err != nil {
 		monitorLog.Errorw("NewFullNodeApi", "err", err)
 		os.Exit(1)
@@ -55,7 +55,7 @@ func StartMonitor() {
 }
 
 func (m *Monitor) run() {
-	minerIds := strings.Split(m.config.M.MinerId, ",")
+	minerIds := strings.Split(m.config.Monitor.MinerId, ",")
 	for _, minerId := range minerIds {
 		epochCh := make(chan abi.ChainEpoch, 1)
 		ctx, cancel := context.WithCancel(context.Background())
@@ -68,7 +68,7 @@ func (m *Monitor) run() {
 	for {
 		select {
 		case <-m.monitorConfChange:
-			nowMinerIds := strings.Split(m.config.M.MinerId, ",")
+			nowMinerIds := strings.Split(m.config.Monitor.MinerId, ",")
 			for _, minerId := range minerIds {
 				isCancel := true
 				for _, nowMinerId := range nowMinerIds {
@@ -103,6 +103,9 @@ func (m *Monitor) run() {
 					go m.monitor(ctx, epochCh, nowMinerId)
 				}
 			}
+
+			newMinerIds := nowMinerIds
+			minerIds = newMinerIds
 		}
 	}
 }
@@ -127,6 +130,8 @@ func (m *Monitor) cancelMonitor(minerId string) {
 }
 
 func (m *Monitor) monitor(ctx context.Context, epochCh chan abi.ChainEpoch, minerId string) {
+	monitorLog.Infow("start monitor", "minerId", minerId)
+
 	minerAddr, err := address.NewFromString(minerId)
 	if err != nil {
 		monitorLog.Errorw("address.NewFromString", "err", err)
@@ -139,8 +144,12 @@ func (m *Monitor) monitor(ctx context.Context, epochCh chan abi.ChainEpoch, mine
 		select {
 		case <-ctx.Done():
 			monitorLog.Infow("exit monitor", "minerId", minerId)
+			return
 		case epoch := <-epochCh:
+			monitorLog.Infow("block received", "minerId", minerId)
+
 			if m.isWin(epoch, minerAddr) {
+				monitorLog.Infow("win block", "minerId", minerId, "epoch", epoch)
 				winBlocks.Push(&WinBlockInfo{
 					WinEpoch:   epoch,
 					CheckEpoch: epoch + delayEpoch,
@@ -158,8 +167,10 @@ func (m *Monitor) monitor(ctx context.Context, epochCh chan abi.ChainEpoch, mine
 
 					msg := ""
 					if isSuccessWin(tipSet, minerAddr) {
+						monitorLog.Infow("success win block", "minerId", minerId, "epoch", epoch)
 						msg = fmt.Sprintf("GOOD!!! %s win block at %d height", minerId, win.WinEpoch)
 					} else {
+						monitorLog.Warnw("loss block", "minerId", minerId, "epoch", epoch)
 						msg = fmt.Sprintf("BAD!!! %s loss block at %d height", minerId, win.WinEpoch)
 					}
 

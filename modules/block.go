@@ -85,7 +85,7 @@ func (m *Monitor) send(epoch abi.ChainEpoch) {
 	for minerId, ch := range m.heightEvent {
 		select {
 		case ch <- epoch:
-			blockLog.Warnw("send epoch success", "minerId", minerId)
+			blockLog.Infow("send epoch success", "minerId", minerId)
 		default:
 			blockLog.Warnw("channel blocked", "minerId", minerId)
 		}

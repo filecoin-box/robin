@@ -14,8 +14,8 @@ var (
 )
 
 type Config struct {
-	N Notify  `yaml:"notify"`
-	M Monitor `yaml:"monitor"`
+	Notify  Notify  `yaml:"notify"`
+	Monitor Monitor `yaml:"monitor"`
 }
 
 type Notify struct {
@@ -33,6 +33,8 @@ func Init() {
 	runtime_viper.SetConfigName("robin")
 	runtime_viper.SetConfigType("yaml")
 	runtime_viper.AddConfigPath("./conf")
+	runtime_viper.AddConfigPath("../conf")
+	runtime_viper.AddConfigPath("../../conf")
 	err := runtime_viper.ReadInConfig()
 	if err != nil {
 		confLog.Errorw("init:ReadInConfig fail", "err", err)

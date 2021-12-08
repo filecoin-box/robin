@@ -11,10 +11,10 @@ func (m *Monitor) watchConfig() {
 		case c := <-confCh:
 			oldConf := m.config
 			m.config = c
-			if oldConf.M != c.M {
+			if oldConf.Monitor != c.Monitor {
 				m.monitorConfChange <- struct{}{}
 			}
-			if oldConf.N != c.N {
+			if oldConf.Notify != c.Notify {
 				m.notifyConfChange <- struct{}{}
 			}
 		}
