@@ -1,4 +1,4 @@
-package slack
+package lark
 
 import (
 	"bytes"
@@ -8,12 +8,20 @@ import (
 )
 
 type message struct {
+	MsgType string  `json:"msg_type"`
+	Content Content `json:"content"`
+}
+
+type Content struct {
 	Text string `json:"text"`
 }
 
-func NewMessage(text string) *message {
+func NewMessage(msgType, msg string) *message {
 	return &message{
-		Text: text,
+		msgType,
+		Content{
+			Text: msg,
+		},
 	}
 }
 

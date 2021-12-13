@@ -9,9 +9,8 @@ var robinLog = logging.Logger("robin")
 
 func (m *Monitor) robin() {
 	app := notify.NewNotify(&notify.Config{
-		notify.Slack,
-		m.config.Notify.Token,
-		m.config.Notify.Channel,
+		notify.Platform(m.config.Notify.Platform),
+		m.config.Notify.Webhook,
 	})
 
 	for {
@@ -25,9 +24,8 @@ func (m *Monitor) robin() {
 			}()
 		case <-m.notifyConfChange:
 			app = notify.NewNotify(&notify.Config{
-				notify.Slack,
-				m.config.Notify.Token,
-				m.config.Notify.Channel,
+				notify.Platform(m.config.Notify.Platform),
+				m.config.Notify.Webhook,
 			})
 		}
 	}

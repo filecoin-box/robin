@@ -20,8 +20,7 @@ type Config struct {
 
 type Notify struct {
 	Platform string `yaml:"platform"`
-	Token    string `yaml:"token"`
-	Channel  string `yaml:"channel"`
+	Webhook  string `yaml:"webhook"`
 }
 
 type Monitor struct {

@@ -1,7 +1,6 @@
 notify:
-  platform: slcak
-  token: xxx
-  channel: xxx
+  platform: slack
+  webhook: https://hooks.slack.com/services/xxx
 
 monitor:
   fullnode_api_info: xxx
