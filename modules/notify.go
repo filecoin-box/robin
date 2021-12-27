@@ -23,11 +23,17 @@ func (m *Monitor) robin() {
 				}
 			}()
 		case <-m.notifyConfChange:
-			app = notify.NewNotify(&notify.Config{
+			newApp := notify.NewNotify(&notify.Config{
 				notify.Platform(m.config.Notify.Platform),
 				m.config.Notify.Webhook,
 			})
+			err := newApp.Send("test notify")
+			if err != nil {
+				robinLog.Warnw("notify test fail, no update", "platform", m.config.Notify.Platform, "webhook", m.config.Notify.Webhook, "err", err)
+			} else {
+				robinLog.Infow("update notify config", "platform", m.config.Notify.Platform, "webhook", m.config.Notify.Webhook)
+				app = newApp
+			}
 		}
 	}
-
 }
